@@ -32,15 +32,6 @@ class LootTable implements ILootTable {
         this.name, this.tries, 100 * this.dropChance);  
     }
 
-    /**
-     * add together loot record drop chances
-     * @param other loot record
-     * @return sum of loot drop chances
-     */
-    double plus(lootRecord other){
-      return this.dropChance + other.dropChance;
-    }
-
   } // lootRecord
 
   double confidence = 0.95;
