@@ -1,26 +1,24 @@
-/**
- * Implementation of LootTable interface
- * 
- */
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Random;
+import java.io.FileReader;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 
+/**
+ * Implementation of ILootTable interface
+ * 
+ */
 class LootTable implements ILootTable {
 
   //--| Internal Data Structure |------------------------------------------------------------------
 
-  List<lootRecord> table = new ArrayList<lootRecord>();
-
   /**
-   * Internal bean for each loot drop
+   * Loot drop record
    */
   public class lootRecord{
-    String name  = "[empty drop]";
+    String name  = "[empty record]";
     int    tries = 0;
     double dropChance = 0.0;
 
@@ -31,9 +29,9 @@ class LootTable implements ILootTable {
       return String.format("%9.10s, %2d tries, drops %4.1f%%", 
         this.name, this.tries, 100 * this.dropChance);  
     }
-
   } // lootRecord
 
+  List<lootRecord> table = new ArrayList<lootRecord>();
   double confidence = 0.95;
   static Random rng = new Random();
 
@@ -41,24 +39,26 @@ class LootTable implements ILootTable {
 
   /**
    * Constructor
-   * @param fileName CSV file to import
+   * @param fileName CSV file to import |String name,int tries|
    */
   LootTable(String fileName){
     load(fileName);
   }
   
   /**
-   * get a stringified randomly selected loot record from the table
+   * get string representation of randomly selected loot record from the table
    */
   public String get(){
     double target = rng.nextDouble();
     double sum = 0.0;
+
     for(lootRecord record : table){
       sum += record.dropChance;
       if(target <= sum){
         return record.toString();
       }
     } // else RNG rolled higher than our total drop chances
+
     return getMostCommonItem().toString();
   }
 
@@ -82,32 +82,31 @@ class LootTable implements ILootTable {
 
   /**
    * Load a set of loot items into loot table from a Comma Separated Value (CSV) file
-   * @param fileName expected CSV format: | name | tries |
+   * @param fileName expected CSV format: | String name | int tries |
    * @throws NumberFormatException if 2nd column isn't an integer (extra space?)
    * @throws FileNotFoundException if can't find the CSV file (path & extension?)
    * @throws IOException other I/O & storage problems
+   * @throws Error on other try failures
    */
-  public boolean load(String fileName){
+  public void load(String fileName){  
     try {
       BufferedReader fileReader = new BufferedReader(new FileReader(fileName));
-      String lootRecord;
+      String lineItem;
 
-      while ((lootRecord = fileReader.readLine()) != null) {
-          String[] lootDetails = lootRecord.split(",");
+      while ((lineItem = fileReader.readLine()) != null) {
+        String[] lootDetails = lineItem.split(",");
 
-          lootRecord data = new lootRecord();
+        lootRecord record = new lootRecord();
+        record.name       = lootDetails[0];
+        record.tries      = Integer.valueOf(lootDetails[1]);
+        record.dropChance = calcDropChance(record.tries);
 
-          data.name = lootDetails[0];
-          data.tries = Integer.valueOf(lootDetails[1]);
-          data.dropChance = calcDropChance(data.tries);
-
-          table.add(data);
+        table.add(record);
       }
       fileReader.close();
-      return true;
     }
     catch (NumberFormatException e) {
-      System.out.println("Invalid String: Integer expected");
+      System.out.println("Invalid String: Integer count of tries expected");
       e.printStackTrace();
     } 
     catch (FileNotFoundException e) {
@@ -116,8 +115,7 @@ class LootTable implements ILootTable {
     catch (IOException e) {
       e.printStackTrace();
     }
-    return false;
-  }
+  } // load
 
   //--| Utility Methods |--------------------------------------------------------------------------
 
@@ -125,12 +123,13 @@ class LootTable implements ILootTable {
    *  @return string representation of loot table
    */
   public String toString(){
-    String stringBeans = new String();
-    for (lootRecord bean : table) {
-      stringBeans = stringBeans + bean + "\n";
+    String stringifiedRecords = new String();
+
+    for (lootRecord record : table) {
+      stringifiedRecords += record + "\n";
     }
-    return stringBeans;
-  }
+    return stringifiedRecords;
+  } // toString
 
   /**
    * Change loot table confidence (1 - risk)
@@ -152,10 +151,8 @@ class LootTable implements ILootTable {
   //--| Internal Methods |-------------------------------------------------------------------------
 
   /**
-   * Calculate drop chance
-   * Given tries & confidence (1-risk), calculate success (1-failure)
+   * Given tries & confidence (1-risk), calculate success (1-failure) 
    *  failure = risk^(1/tries)
-   *  failure = (1-confidence)^(1/tries)
    *  success = 1 - (1-confidence)^(1/tries)
    * @param tries before it's confidence% certain the loot has dropped
    */
@@ -163,13 +160,18 @@ class LootTable implements ILootTable {
     return 1.0 - Math.pow(1.0 - confidence, 1.0 / tries);
   }
 
+  /**
+   * @return record in table with highest drop chance
+   */
   lootRecord getMostCommonItem(){
     lootRecord mostCommon = new lootRecord();
+
     for(lootRecord record : table){
       if(record.dropChance > mostCommon.dropChance){
         mostCommon = record;
       }
     }
     return mostCommon;
-  }
-}
+  } // getMostCommon
+
+} // lootTable
