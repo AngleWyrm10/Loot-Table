@@ -9,7 +9,7 @@ public class App {
     System.out.println( 
       String.format("%d records in loot table, total drop chance: %4.1f%%\n", 
         myLootTable.size(), 100 * myLootTable.total() 
-      ) + myLootTable.toString() + "\n"
+      ) + myLootTable.toString()
     );
 
     // get several random loot drops from the table

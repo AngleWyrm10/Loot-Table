@@ -22,7 +22,7 @@ class LootTable implements ILootTable {
   public class lootRecord{
     String name  = "[empty drop]";
     int    tries = 0;
-    double dropChance = 0.01;
+    double dropChance = 0.0;
 
     /**
      * @return string representation of loot drop
@@ -59,7 +59,7 @@ class LootTable implements ILootTable {
         return record.toString();
       }
     } // else RNG rolled higher than our total drop chances
-    return new lootRecord().toString();
+    return getMostCommonItem().toString();
   }
 
   /**
@@ -161,5 +161,15 @@ class LootTable implements ILootTable {
    */
   double calcDropChance(int tries){
     return 1.0 - Math.pow(1.0 - confidence, 1.0 / tries);
+  }
+
+  lootRecord getMostCommonItem(){
+    lootRecord mostCommon = new lootRecord();
+    for(lootRecord record : table){
+      if(record.dropChance > mostCommon.dropChance){
+        mostCommon = record;
+      }
+    }
+    return mostCommon;
   }
 }
