@@ -86,7 +86,6 @@ class LootTable implements ILootTable {
    * @throws NumberFormatException if 2nd column isn't an integer (extra space?)
    * @throws FileNotFoundException if can't find the CSV file (path & extension?)
    * @throws IOException other I/O & storage problems
-   * @throws Error on other try failures
    */
   public void load(String fileName){  
     try {
