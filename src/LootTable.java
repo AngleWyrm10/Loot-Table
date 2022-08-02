@@ -18,9 +18,9 @@ class LootTable implements ILootTable {
    * Loot drop record
    */
   public class lootRecord{
-    String name  = "[empty record]";
-    int    tries = 0;
-    double dropChance = 0.0;
+    String  name  = "[empty record]";
+    Integer tries = 0;
+    Double  dropChance = 0.0;
 
     /**
      * @return string representation of loot drop
@@ -32,7 +32,7 @@ class LootTable implements ILootTable {
   } // lootRecord
 
   List<lootRecord> table = new ArrayList<lootRecord>();
-  double confidence = 0.95;
+  Double confidence = 0.95;
   static Random rng = new Random();
 
   //--| Primary Interface |------------------------------------------------------------------------
@@ -49,8 +49,8 @@ class LootTable implements ILootTable {
    * get string representation of randomly selected loot record from the table
    */
   public String get(){
-    double target = rng.nextDouble();
-    double sum = 0.0;
+    Double target = rng.nextDouble();
+    Double sum = 0.0;
 
     for(lootRecord record : table){
       sum += record.dropChance;
@@ -73,7 +73,7 @@ class LootTable implements ILootTable {
    * @return total of loot drop chances
    */
   public double total(){
-    double total = 0.0;
+    Double total = 0.0;
     for (lootRecord record : table) {
       total += record.dropChance;
     }
@@ -143,8 +143,16 @@ class LootTable implements ILootTable {
    * get confidence (1 - risk)
    * @return confidence [0..1]
    */
-  public double getConfidence(){
+  public Double getConfidence(){
     return this.confidence;
+  }
+
+  /**
+   * size of leftover drop chance in tries
+   * @return tries
+   */
+  public double remainderInTries(){
+    return ( Math.log(1 - confidence) / Math.log(this.total()) );
   }
 
   //--| Internal Methods |-------------------------------------------------------------------------

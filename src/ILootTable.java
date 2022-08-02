@@ -7,4 +7,5 @@ interface ILootTable {
   int     size();                // get count of records in loot table
   double  total();               // get total of loot drop chances
   String  toString();            // Stringified version of table
+  double  remainderInTries();    // Size of remaining drop chance in tries
 }
