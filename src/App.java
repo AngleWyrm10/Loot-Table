@@ -7,7 +7,7 @@ public class App {
 
     // print the contents of the loot table
     System.out.println( 
-      String.format("%d records in loot table, total drop chance: %4.1f%% (%4.1f try remainder)\n%s", 
+      String.format("%d records in loot table, total drop chance: %4.1f%% (%4.1f tries to draw remainder)\n%s", 
         myLootTable.size(), 100 * myLootTable.total(), myLootTable.remainderInTries(), myLootTable
       )
     );
